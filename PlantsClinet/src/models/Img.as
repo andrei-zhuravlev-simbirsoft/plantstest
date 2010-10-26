@@ -1,13 +1,14 @@
 package models
 {
 	import flash.display.Loader;
-	import flash.display.Sprite;
 	import flash.display.LoaderInfo;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	
 	import game.BitmapCache;
+	
 	import utils.*;
 	
 	public class Img extends Sprite
@@ -73,8 +74,9 @@ package models
 		private function onSuccess(event:Event):void
 		{
 			var info:LoaderInfo = LoaderInfo(this.mLoader.contentLoaderInfo);
+			var pattern:RegExp = /image\//
 			
-			if (info.contentType.match(new RegExp("/image\//"))) // image is loaded
+			if (info.contentType.match(pattern)) // image is loaded
 			{
 				this.addChild(this.mLoader);
 			}

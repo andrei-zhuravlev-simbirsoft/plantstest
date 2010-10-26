@@ -21,11 +21,12 @@ package models
 		public function fromXML(plant_node:XML):void
 		{	
 			this.Name = plant_node.localName();
-			this.State = new PlantState(); //TODO: to be implemented
 			
 			super.Id = plant_node.attribute("id");
 			super.X = plant_node.attribute("x");
 			super.Y = plant_node.attribute("y");
+			
+			this.State = new PlantState(plant_node.attribute("state"), super.Id); 
 		}
 		
 		public function getSprite():Img
