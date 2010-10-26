@@ -1,0 +1,108 @@
+package utils {
+	
+	import flash.events.Event;
+	import flash.net.URLRequest;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
+	import flash.xml.*;
+	
+	import models.*;
+	
+	public static var COUNTRY:String = "country";
+	public static var ERROR:String = "error";
+	public static var IMAGE:String = "image";
+	
+	public class DataLoader 
+	{    
+		private var loader:URLLoader;
+		private var retriDataLoaderata:Boolean = false;
+
+		public function Broker() 
+		{
+			loader = new URLLoader();
+			
+			loader.addEventListener(Event.COMPLETE, onLoadComplete);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, onError);
+		}
+		
+		public function getCurrentField():void
+		{
+			var request:URLRequest = new URLBroker().getURLRequest(Commands.STATE);
+			
+			this.request(request);
+		}
+		
+		public function nextTurn():void
+		{	
+			var request:URLRequest = new URLBroker().getURLRequest(Commands.TURN);
+			
+			this.request(request);
+		}
+		
+		public function seedPlant(x:int, y:int, plant_id:int):void
+		{	
+			var request:URLRequest = new URLBroker().getURLRequest(Commands.SEED, new Array(x, y, plant_id));
+			
+			this.request(request);
+		}
+		
+		public function digPlant(x:int, y:int):void
+		{	
+			var request:URLRequest = new URLBroker().getURLRequest(Commands.DIG, new Array(x, y, plant_id));
+			
+			this.request(request);
+		}
+
+		public function getImage(plant_id:int, state_id:int):void
+		{	
+			var request:URLRequest = new URLBroker().getURLRequest(Commands.IMAGE, new Array(plant_id, state_id));
+			
+			this.request(request);
+		}
+
+		private function request(req:URLRequest)
+		{
+			try 
+			{
+				this.loader.load(req);
+			}
+			catch (error:SecurityError)
+			{
+				trace("A SecurityError has occurred.");
+			}
+			
+			this.retrievingData = true;
+		}
+		
+		private function parseData(data:XML):Array
+		{
+			switch(data.localName())
+			{
+				case DataLoader.COUNTRY: break;
+				case DataLoader.ERROR: break;
+			}
+			for each ()
+		}
+		
+		private function onError(e:IOErrorEvent):void 
+		{
+			//xmlTextField.text = "Had problem loading the XML File.";
+			this.retrievingData = false;
+		}
+
+		private function onLoadComplete(event:Event):void 
+		{	
+			try 
+			{
+				externalXML = new XML(loader.data);
+				readNodes(externalXML);    
+			} 
+			catch (e:TypeError) 
+			{
+				trace("Could not parse the XML file.");
+			}
+			this.retrievingData = false;
+		}
+
+	}
+}
