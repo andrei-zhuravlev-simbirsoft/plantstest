@@ -1,29 +1,72 @@
 package game
 {	
+	import events.SpriteLoadedEvent;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	
 	import models.Img;
 	
-	public class BitmapCache
+	public class BitmapCache extends EventDispatcher
 	{
-		public static var mImages:Array;
+		/*private*/public static var mImages:Array = new Array();
+		private static var mInstance:BitmapCache = new BitmapCache();
 		
 		public function BitmapCache()
 		{
+			this.addEventListener(events.SpriteLoadedEvent.TYPE, onSpriteLoaded);
 		}
 		
-		static public function addImage(img:Img):Boolean
+		static public function get instance():BitmapCache
+		{
+			return BitmapCache.mInstance;
+		}
+		
+		public function addImage(img:Img):Boolean
+		{
+			/*for each (var i:Img in BitmapCache.mImages)
+			{
+			if (i.plant_id == img.plant_id && i.state_id == img.state_id)
+			return false;
+			}*/
+
+			if (this.checkCache(img.plant_id, img.state_id) == null)
+			{			
+				BitmapCache.mImages.push(img);
+				trace("sprite cached");
+			}
+			
+			return true;
+		}
+		
+		public function checkCache(plant_id:int, state_id:int):Img
 		{
 			for each (var i:Img in BitmapCache.mImages)
 			{
-				if (i.plant_id == img.plant_id && i.state_id == img.state_id)
-					return false;
+				if (i.plant_id == plant_id && i.state_id == state_id)
+					return i;
 			}
 			
-			BitmapCache.mImages.push(img);
+			return null;
+		}
+		
+		private function onSpriteLoaded(event:SpriteLoadedEvent):void
+		{
+			// check if all sprites are already loaded
+			var all_loaded:Boolean = true;
+			for each (var i:Img in BitmapCache.mImages)
+			{
+				if (!i.isLoaded)
+					return;
+			}
 			
-			return true;
+			if (all_loaded)
+			{
+				trace("-------------------------all loaded");
+				this.dispatchEvent(new Event("AllSpritesLoaded",true));
+			}
 		}
 	}
 }

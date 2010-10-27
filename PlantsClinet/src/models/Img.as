@@ -1,10 +1,16 @@
 package models
 {
+	import events.SpriteLoadedEvent;
+	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.BlendMode;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.geom.ColorTransform;
 	import flash.net.URLRequest;
 	
 	import game.BitmapCache;
@@ -17,6 +23,9 @@ package models
 		public var state_id:int;
 		
 		private var mLoader:Loader = new Loader();
+		private var mSpriteLoaded:Boolean = false;
+		
+		private var mCache:BitmapCache = BitmapCache.instance;
 		
 		public function Img(plant_id:int, state_id:int)
 		{
@@ -29,13 +38,18 @@ package models
 			mLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSuccess);
 			
 			this.getImage(this.plant_id,this.state_id);
+			
+			mCache.addImage(this);
 		}
 		
 		private function getImage(plant_id:int=-1, state_id:int=-1):Object
 		{	
-			var _sprite:Img = checkCache(plant_id, state_id);
+			var _sprite:Img = mCache.checkCache(plant_id, state_id);
 			if (_sprite != null)
+			{
+				this.mSpriteLoaded = true;
 				return _sprite;
+			}
 			
 			var request:URLRequest;
 			
@@ -55,30 +69,61 @@ package models
 			return null;
 		}
 		
-		protected function checkCache(plant_id:int, state_id:int):Img
+		/*protected function checkCache(plant_id:int, state_id:int):Img
 		{
-			for each (var i:Img in game.BitmapCache.mImages)
+			for each (var i:Img in BitmapCache.mImages)
 			{
 				if (i.plant_id == plant_id && i.state_id == state_id)
 					return i;
 			}
 			
 			return null;
+		}*/
+		
+		public function get isLoaded():Boolean
+		{
+			return this.mSpriteLoaded;
 		}
+		
+		public function getBitmap(fillcolor:int=0x00000000):Bitmap
+		{	
+			if (this.isLoaded)
+			{
+				var bd:BitmapData = new BitmapData(this.width, this.height, true, fillcolor);
+				bd.draw(this);
+				return new Bitmap(bd);
+			}
+			
+			return null;
+		}
+		
+		/*public function Clone():Img
+		{
+			var clone:Img = new Img(this.plant_id,this.state_id);
+			return clone;
+		}*/
 		
 		private function onError(event:Event):void
 		{
-			
+			this.mSpriteLoaded = true; //FIXME
 		}
 		
 		private function onSuccess(event:Event):void
 		{
+			if (this.isLoaded)
+				return;
+			
 			var info:LoaderInfo = LoaderInfo(this.mLoader.contentLoaderInfo);
 			var pattern:RegExp = /image\//
 			
 			if (info.contentType.match(pattern)) // image is loaded
 			{
+				this.mSpriteLoaded = true;
+				trace("sprite pid: "+this.plant_id+", sid: "+this.state_id+" loaded");
+				
+				//mCache.addImage(this);
 				this.addChild(this.mLoader);
+				mCache.dispatchEvent(new SpriteLoadedEvent(this.plant_id, this.state_id, true));
 			}
 		}
 	}

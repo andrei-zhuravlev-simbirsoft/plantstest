@@ -3,8 +3,7 @@ package utils {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
+	import flash.net.*;
 	import flash.xml.*;
 	
 	import models.*;
@@ -17,7 +16,7 @@ package utils {
 		public static var COUNTRY:String = "country";
 		public static var ERROR:String = "error";
 		public static var HERBARIUM:String = "herbarium";
-		public static var IMAGE:String = "image";
+		//public static var IMAGE:String = "image";
 		
 		public var data:Object = null;
 
@@ -97,6 +96,9 @@ package utils {
 		{
 			try 
 			{
+				req.requestHeaders.push(new URLRequestHeader("Pragma", "no-cache"));
+				req.requestHeaders.push(new URLRequestHeader("Cache-Control", "no-store"));
+				req.data = new URLVariables("time="+Number(new Date().getTime()))
 				this.loader.load(req);
 			}
 			catch (error:SecurityError)

@@ -17,6 +17,8 @@ package utils
 		private var mPid:int; //plant_id
 		private var mSid:int; //state_id
 		
+		private var mCache:BitmapCache = BitmapCache.instance;
+		
 		public function SpriteLoader()
 		{
 			mLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);
@@ -71,7 +73,7 @@ package utils
 			{
 				var _img:Img = new Img(this.mPid, this.mSid);
 				_img.addChild(this.mLoader);
-				BitmapCache.addImage(_img);
+				mCache.addImage(_img);
 			}
 		}
 

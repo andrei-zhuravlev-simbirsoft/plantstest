@@ -1,6 +1,7 @@
 package
 {
 	import models.Plant;
+	import models.Img;
 
 	public class AppState
 	{
@@ -21,6 +22,17 @@ package
 			}
 			
 			return -1;
+		}
+		
+		/***
+		 * This methods force loading sprites for all Plants on current field
+		 **/
+		public static function getSpritesForPlants():void
+		{
+			for each (var h:Plant in AppState.field)
+			{
+				h.getSprite();
+			}
 		}
 	}
 }

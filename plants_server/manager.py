@@ -41,7 +41,7 @@ class Manager:
             p = models.Plant(pnt.id, pnt.plant_id, pnt.x, pnt.y, pnt.name, pnt.state_id)
             return p
 
-    def getPlantByPlantId(self,id):
+    def getPlantByPlantId(self, id):
         _plant = db.select(['plants'],
                            where="plant_id=$pid",
                            vars=dict(pid=id))
@@ -148,27 +148,26 @@ class Manager:
                           state_id=self.getStateIdForPlant(tile.plant_id, "next", tile.state_id), vars=dict(id=tile.id))
 
 
-    def getPlantImage(self,plant_id,state_id=None):
-
-         if not state_id:
+    def getPlantImage(self, plant_id, state_id=None):
+        if not state_id:
             state_id = self.getStateIdForPlant(plant_id, "seed")
 
-         plant = self.getPlantByPlantId(plant_id)
+        plant = self.getPlantByPlantId(plant_id)
 
-         if not plant:
-             return None,None
+        if not plant:
+            return None, None
 
-         pss = db.select(['plant_states'],
-                               where="plant_id=$pid AND state_id=$sid",
-                               vars = dict(pid = plant_id,sid = state_id))
+        pss = db.select(['plant_states'],
+                        where="plant_id=$pid AND state_id=$sid",
+                        vars=dict(pid=plant_id, sid=state_id))
 
-         for ps in pss:
+        for ps in pss:
             sprite_name = ps.sprite_name
 
-         sprite = os.path.abspath(os.path.join(cfg.res_dir,plant.name,"Images",sprite_name))
-         return sprite, open(sprite,"rb").read()
+        sprite = os.path.abspath(os.path.join(cfg.res_dir, plant.name, "Images", sprite_name))
+        return sprite, open(sprite, "rb").read()
 
     def getBackgroundImage(self):
-        sprite = os.path.abspath(os.path.join(cfg.res_dir,cfg.background))
-        return sprite, open(sprite,"rb").read()
+        sprite = os.path.abspath(os.path.join(cfg.res_dir, cfg.background))
+        return sprite, open(sprite, "rb").read()
 
