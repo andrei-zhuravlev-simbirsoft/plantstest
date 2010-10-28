@@ -13,6 +13,7 @@ package game
 	{
 		/*private*/public static var mImages:Array = new Array();
 		private static var mInstance:BitmapCache = new BitmapCache();
+		private var mIsAllLoaded:Boolean = false;
 		
 		public function BitmapCache()
 		{
@@ -52,6 +53,11 @@ package game
 			return null;
 		}
 		
+		public function get isAllLoaded():Boolean
+		{
+			return this.mIsAllLoaded;
+		}
+		
 		private function onSpriteLoaded(event:SpriteLoadedEvent):void
 		{
 			// check if all sprites are already loaded
@@ -59,12 +65,16 @@ package game
 			for each (var i:Img in BitmapCache.mImages)
 			{
 				if (!i.isLoaded)
+				{
+					this.mIsAllLoaded = false;
 					return;
+				}
 			}
 			
 			if (all_loaded)
 			{
-				trace("-------------------------all loaded");
+				//trace("-------------------------all loaded");
+				this.mIsAllLoaded = true;
 				this.dispatchEvent(new Event("AllSpritesLoaded",true));
 			}
 		}

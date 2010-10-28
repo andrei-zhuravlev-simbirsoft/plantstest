@@ -1,7 +1,3 @@
-/*------------------------------------------------------------
-* @author: Anton Karlov (http://www.ant-karlov.ru)
-* @desc: Игровая карта.
-*----------------------------------------------------------*/
 package game
 {
 	
@@ -10,19 +6,23 @@ package game
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	import flash.geom.*;
 	import flash.utils.flash_proxy;
+	
+	import models.*;
 	
 	public class Field extends Sprite
 	{
 		
 		// Constants:
-		public static const SCR_WIDTH:int = 550;
-		public static const SCR_HEIGHT:int = 400;
+		public static const SCR_WIDTH:int = 1024;
+		public static const SCR_HEIGHT:int = 768;
 		public static const CELL_SIZE:int = 100;
-		public static const DECAY:Number = .9;
-		public static const MAP_W:int = 20;
-		public static const MAP_H:int = 20;
+		public static const DECAY:Number = 0.9;
+		public static const MAP_W:int = 10;
+		public static const MAP_H:int = 10;
 		
 		// Public Properties:		
 		
@@ -35,17 +35,32 @@ package game
 		private var _mapWidth:int = MAP_W * CELL_SIZE;
 		private var _mapHeight:int = MAP_H * CELL_SIZE;
 		
-		private var _bmp:BitmapData; // Игровая сетка
+		private var _bmp:Bitmap; // Игровая сетка
 		
 		// Initialization:
-		public function Field(field_bmp:BitmapData)
+		public function Field(width:int,height:int,startx:int,starty:int)
 		{
-			/* Создаем игровую сетку */
-			this._bmp = field_bmp;
+			grid(width,height,startx,starty);
 			
-			grid(MAP_W, MAP_H);
-			
-			addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+			//addEventListener(Event.ENTER_FRAME, enterFrameHandler);
+		}
+		
+		private function onTileRollOver(event:MouseEvent):void
+		{
+			(event.target as Tile).selected();
+		}
+		
+		private function onTileRollOut(event:MouseEvent):void
+		{
+			(event.target as Tile).deselected();
+		}
+		
+		private function onTileClick(event:MouseEvent):void
+		{
+			var t:Tile = (event.currentTarget as Tile);
+			var s:String = "Tile X-"+t.X.toString()+" Y-"+t.Y.toString()+" isPlant-"+t.hasPlant.toString();
+			ExternalInterface.call("alert",s);
+			trace(s);
 		}
 		
 		// Public Methods:
@@ -69,68 +84,84 @@ package game
 		{
 			return _mapHeight;
 		}
+				
+//		private function enterFrameHandler(e:Event):void
+//		{			
+//			/* Прибавляем скорость к положению карты */
+//			x += int(_speedX);
+//			y += int(_speedY);
+//			
+//			/* Горизонтальная прокрутка */
+//			if (x > 0) // Выезд за левый край
+//			{
+//				x = 0;
+//				_speedX = 0;
+//			}
+//			else if (x < -_mapWidth + SCR_WIDTH) // Выезд за правый край
+//			{
+//				x = -_mapWidth + SCR_WIDTH;
+//				_speedX = 0;
+//			}
+//			
+//			/* Вертикальная прокрутка */
+//			if (y > 0) // Выезд за верхний край
+//			{
+//				y = 0;
+//				_speedY = 0;
+//			}
+//			else if (y < -_mapHeight + SCR_HEIGHT) // Выезд за нижний край
+//			{
+//				y = -_mapHeight + SCR_HEIGHT;
+//				_speedY = 0;
+//			}			
+//			
+//			/* Применяем торможение к скорости */
+//			_speedX *= DECAY;
+//			_speedY *= DECAY;
+//		}
 		
-		/*public function addParticle(ax:int, ay:int):void
+		private function grid(w:int, h:int, startx:int, starty:int):void
 		{
-			/* Создание нового партикла */
-		/*	var p:Particle = new Particle();
-			p.x = (Math.random() * 10 - 5) + ax;
-			p.y = (Math.random() * 10 - 5) + ay;
-			addChild(p);
-			p.addEventListener(Event.ENTER_FRAME, particleLifeHandler);
-		}*/
-		
-		// Protected Methods:
-		
-		private function particleLifeHandler(e:Event):void
-		{
-			var mc:MovieClip = MovieClip(e.target);
-			if (mc.currentFrame == mc.totalFrames)
-			{
-				mc.removeEventListener(Event.ENTER_FRAME, particleLifeHandler);
-				removeChild(mc);
-				mc = null;
-			}			
-		}
-		
-		private function enterFrameHandler(e:Event):void
-		{			
-			/* Прибавляем скорость к положению карты */
-			x += int(_speedX);
-			y += int(_speedY);
+			var px:int = startx;
+			var py:int = starty;
+			var pheight:int = 0;
+			var pwidth:int = 0;
+			var firstpheight:int=0;
+			var firstpy:int = 0;
 			
-			/* Горизонтальная прокрутка */
-			if (x > 0) // Выезд за левый край
+			for (var j:int = 0; j < h; j++)
 			{
-				x = 0;
-				_speedX = 0;
+				for (var i:int = 0; i < w; i++)	
+				{
+					var obj:Tile = AppState.getPlantImgAtCoords(i,j);
+					obj.addEventListener(MouseEvent.ROLL_OVER,onTileRollOver);
+					obj.addEventListener(MouseEvent.ROLL_OUT,onTileRollOut);
+					obj.addEventListener(MouseEvent.CLICK,onTileClick);
+					if (pheight == 0 && pwidth == 0)
+					{
+						obj.x = px;
+						obj.y = py;
+						firstpheight = obj.height;
+						firstpy = obj.y;
+					}
+					else
+					{
+						obj.x = px-(obj.width / 2);
+						obj.y = py+(pheight+25-obj.height);
+					}
+					
+					px = obj.x;
+					py = obj.y
+					pheight = obj.height;
+					pwidth = obj.width;
+					trace("Draw at X:"+px.toString()+" Y:"+py.toString());
+					this.addChild(obj);
+				}
+				px = startx+50*(j+1);
+				py = firstpy+(firstpheight+25-AppState.getPlantImgAtCoords(0,j+1).height)//starty+75*(j+1);
+				pheight = 0;
+				pwidth = 0;
 			}
-			else if (x < -_mapWidth + SCR_WIDTH) // Выезд за правый край
-			{
-				x = -_mapWidth + SCR_WIDTH;
-				_speedX = 0;
-			}
-			
-			/* Вертикальная прокрутка */
-			if (y > 0) // Выезд за верхний край
-			{
-				y = 0;
-				_speedY = 0;
-			}
-			else if (y < -_mapHeight + SCR_HEIGHT) // Выезд за нижний край
-			{
-				y = -_mapHeight + SCR_HEIGHT;
-				_speedY = 0;
-			}			
-			
-			/* Применяем торможение к скорости */
-			_speedX *= DECAY;
-			_speedY *= DECAY;
-		}
-		
-		private function grid(w:int, h:int):void
-		{
-			addChild(new Bitmap(this._bmp));
 		}
 	}
 	

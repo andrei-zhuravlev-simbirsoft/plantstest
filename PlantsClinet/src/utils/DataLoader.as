@@ -115,6 +115,8 @@ package utils {
 			{
 				case DataLoader.COUNTRY:
 					AppState.field = new Array();
+					Config.GridSizeX = int(data.field.attribute("size_x"));
+					Config.GridSizeY = int(data.field.attribute("size_y"));
 					for each (var p:XML in data.field.children())
 					{
 						AppState.field.push(new Plant(p));

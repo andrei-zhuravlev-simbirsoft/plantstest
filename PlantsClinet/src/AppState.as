@@ -1,7 +1,8 @@
 package
 {
-	import models.Plant;
 	import models.Img;
+	import models.Plant;
+	import models.Tile;
 
 	public class AppState
 	{
@@ -33,6 +34,20 @@ package
 			{
 				h.getSprite();
 			}
+		}
+		
+		public static function getPlantImgAtCoords(x:int, y:int):Tile
+		{
+			for each (var p:Plant in AppState.field)
+			{
+				if (p.X == x && p.Y == y)
+				{
+					trace("PLANT - X:"+x.toString()+" Y:"+y.toString());
+					return new Tile(x,y,p.getSprite(),true);
+				}
+			}
+			trace("HOLDER - X:"+x.toString()+" Y:"+y.toString());
+			return new Tile(x,y,new Img(),false);
 		}
 	}
 }

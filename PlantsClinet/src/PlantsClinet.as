@@ -21,6 +21,7 @@ package {
 	import utils.*;
 	
 	//[SWF(widthPercent="1024" , heightPercent="768")]
+	[SWF(width="1024" , height="768")]
 	public class PlantsClinet extends MovieClip 
 	{
 		private var mLoader:DataLoader = new DataLoader();
@@ -32,7 +33,7 @@ package {
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.SHOW_ALL;
 			
-			mLoader.addEventListener("StateLoaded",onStateLoaded);
+			mLoader.addEventListener("StateLoaded",onStateUpdated);
 			mLoader.addEventListener("HerbariumLoaded",onHerbariumLoaded);
 			mCache.addEventListener("AllSpritesLoaded",onAllSpritesLoaded);
 			
@@ -75,7 +76,7 @@ package {
 			}
 		}
 		
-		private function onStateLoaded(event:Event):void
+		private function onStateUpdated(event:Event):void
 		{	
 			// Here we have Herbarium & Initial State
 			this.cleanupScene();
@@ -93,16 +94,57 @@ package {
 		}
 		
 		private function onAllSpritesLoaded(event:Event):void
-		{
-			var i:int = 0;
+		{	
+			this.cleanupScene();
+			var f:Field = new Field(Config.GridSizeX,Config.GridSizeY,450,100);
+			this.addButtons();
+			//var f:Field = new Field(5,4,400,100);
+			this.addChild(f);
+			/*ar i:int = 0;
+			var px:int = 400;
+			var py:int = 200;
+			var pheight:int = 0;
+			var pwidth:int = 0;
 			for each (var h:Plant in AppState.field)
 			{
-				var plant:Bitmap = h.getSprite().getBitmap();
-				plant.x = i+(plant.width / 2);
-				plant.y = i+(plant.height-50);
+				var plant:Bitmap = h.getSprite().getBitmap();//0xffffffff);
+				if (pheight == 0 && pwidth == 0)
+				{
+					plant.x = px;
+					plant.y = py;
+				}
+				else
+				{
+					plant.x = px-(plant.width / 2);
+					if (pheight <= plant.height)
+						plant.y = py+(pheight+25-plant.height);
+					else
+						plant.y = py+(pheight+25-plant.height);//-50;
+				}
+
+
 				this.addChild(plant);
-				i+=50;
+				px = plant.x;
+				py = plant.y
+				pheight = plant.height;
+				pwidth = plant.width;
 			}
+			var z:Img = new Img();
+			z.x=300;
+			z.y=400;
+			z.addEventListener(MouseEvent.ROLL_OVER,onROver);
+			z.addEventListener(MouseEvent.ROLL_OUT,onROut);
+			this.addChild(z);*/
+		}
+		
+		private function onROver(event:MouseEvent):void
+		{
+			(event.target as Img).drawPlaceholder(50,0,0.5);
+		}
+		
+		private function onROut(event:MouseEvent):void
+		{
+			(event.target as Img).drawPlaceholder(50,0x00ff0000,0);
 		}
 		
 		private function onTurn(event:Event):void

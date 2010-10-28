@@ -27,19 +27,45 @@ package models
 		
 		private var mCache:BitmapCache = BitmapCache.instance;
 		
-		public function Img(plant_id:int, state_id:int)
+		public function Img(plant_id:int = -1, state_id:int = -1)
 		{
 			super();
 			
-			this.plant_id = plant_id;
-			this.state_id = state_id;
+			if (plant_id > 0 && state_id > 0) // image will be loaded
+			{
+				this.plant_id = plant_id;
+				this.state_id = state_id;
 			
-			mLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);
-			mLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSuccess);
+				mLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onError);
+				mLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSuccess);
 			
-			this.getImage(this.plant_id,this.state_id);
+				this.getImage(this.plant_id,this.state_id);
 			
-			mCache.addImage(this);
+				mCache.addImage(this);
+			}
+			else // placeholder sprite
+			{
+				//this.drawPlaceholder(50,);
+			}
+		}
+		
+		public function drawPlaceholder(sizex:int,sizey:int,color:int,alpha:Number=1):void
+		{			
+			this.graphics.clear();
+			this.graphics.beginFill(color,alpha);
+			this.graphics.lineStyle(0,0,0.5);
+			//this.graphics.drawRect(0,0,sizex,sizey);
+			this.graphics.moveTo(sizex*0.5,0);
+			this.graphics.lineTo(0,sizey*0.5);
+			this.graphics.lineTo(sizex*0.5,sizey);
+			this.graphics.lineTo(sizex,sizey*0.5);
+			this.graphics.lineTo(sizex*0.5,0);
+			//original
+			/*this.graphics.moveTo(-size,0);
+			this.graphics.lineTo(0,-size*0.5);
+			this.graphics.lineTo(size,0);
+			this.graphics.lineTo(0,size*0.5);
+			this.graphics.lineTo(-size,0);*/
 		}
 		
 		private function getImage(plant_id:int=-1, state_id:int=-1):Object
@@ -97,12 +123,6 @@ package models
 			return null;
 		}
 		
-		/*public function Clone():Img
-		{
-			var clone:Img = new Img(this.plant_id,this.state_id);
-			return clone;
-		}*/
-		
 		private function onError(event:Event):void
 		{
 			this.mSpriteLoaded = true; //FIXME
@@ -119,7 +139,7 @@ package models
 			if (info.contentType.match(pattern)) // image is loaded
 			{
 				this.mSpriteLoaded = true;
-				trace("sprite pid: "+this.plant_id+", sid: "+this.state_id+" loaded");
+				//trace("sprite pid: "+this.plant_id+", sid: "+this.state_id+" loaded");
 				
 				//mCache.addImage(this);
 				this.addChild(this.mLoader);

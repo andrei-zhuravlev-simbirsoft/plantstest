@@ -1,0 +1,42 @@
+	PLANT - X:0 Y:0
+	Draw at X:400 Y:100
+HOLDER - X:1 Y:0
+Draw at X:350 Y:175
+HOLDER - X:2 Y:0
+Draw at X:300 Y:200
+HOLDER - X:3 Y:0
+Draw at X:250 Y:225
+HOLDER - X:4 Y:0
+Draw at X:200 Y:250
+HOLDER - X:5 Y:0
+Draw at X:150 Y:275
+HOLDER - X:6 Y:0
+Draw at X:100 Y:300
+	HOLDER - X:0 Y:1
+	Draw at X:450 Y:175
+PLANT - X:1 Y:1
+Draw at X:401 Y:197
+HOLDER - X:2 Y:1
+Draw at X:351 Y:225
+HOLDER - X:3 Y:1
+Draw at X:301 Y:250
+HOLDER - X:4 Y:1
+Draw at X:251 Y:275
+HOLDER - X:5 Y:1
+Draw at X:201 Y:300
+HOLDER - X:6 Y:1
+Draw at X:151 Y:325
+	PLANT - X:0 Y:2
+	Draw at X:500 Y:250
+PLANT - X:1 Y:2
+Draw at X:451 Y:275
+HOLDER - X:2 Y:2
+Draw at X:401 Y:303
+HOLDER - X:3 Y:2
+Draw at X:351 Y:328
+HOLDER - X:4 Y:2
+Draw at X:301 Y:353
+HOLDER - X:5 Y:2
+Draw at X:251 Y:378
+HOLDER - X:6 Y:2
+Draw at X:201 Y:403
