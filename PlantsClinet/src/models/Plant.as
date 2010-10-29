@@ -5,6 +5,7 @@ package models
 	
 	import models.*;
 	import game.BitmapCache;
+	import events.SpriteLoadedEvent;
 	
 	public class Plant extends GameObject
 	{
@@ -32,22 +33,13 @@ package models
 			this.State = new PlantState(plant_node.attribute("state"), super.Id); 
 		}
 		
-		protected function checkCache(plant_id:int, state_id:int):Img
-		{
-			for each (var i:Img in BitmapCache.mImages)
-			{
-				if (i.plant_id == plant_id && i.state_id == state_id)
-					return i;
-			}
-			
-			return null;
-		}
-		
 		public function getSprite():Img
 		{
-			var cached:Img = this.checkCache(AppState.getPlantIdByName(this.Name),this.State.Id);
+			var cached:Img = mCache.checkCache(AppState.getPlantIdByName(this.Name),this.State.Id);
 			if (cached != null)
+			{
 				return cached;
+			}
 			
 			return new Img(AppState.getPlantIdByName(this.Name),this.State.Id);
 		}

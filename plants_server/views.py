@@ -22,14 +22,14 @@ class state(BaseView):
 
 class seed(BaseView):
     def GET(self, x_coord, y_coord, plant_id):
-    #if not x_coord:
-    #    return "Error:No X"
-    #if not y_coord:
-    #    return "Error:No Y"
-    #if not plant_id:
-    #    return "Error:Unknown Plant"
+        if not x_coord:
+            return models.Error().asXML("1","No X coord specified")
+        if not y_coord:
+            return models.Error().asXML("2","No Y coord specified")
+        if not plant_id:
+            return models.Error().asXML("3","Unknown Plant")
         if not self.broker.seedPlant(x_coord, y_coord, plant_id):
-            return "fail"
+            return models.Error().asXML("4","Can't seed plant at specified coords")
         return self.broker.getField().toxml()
 
 class dig(BaseView):
@@ -38,11 +38,9 @@ class dig(BaseView):
             y_coord = None
 
         if not self.broker.digPlant(x_coord, y_coord):
-            return "fail:cant' dig"
+            return models.Error().asXML("5","Can't dig. No plant or plant is not grown up")
         else:
             return self.broker.getField().toxml()
-
-        #return "Dig at X:"+x_coord+" Y:"+str(y_coord)
 
 class turn(BaseView):
     def GET(self):
@@ -65,7 +63,7 @@ class image(BaseView):
             sprite_name,image = self.broker.getPlantImage(plant_id,state_id)
 
         if not(sprite_name or image):
-            return "fail: no image"
+            return models.Error().asXML("6","No Image for plant")
 
         ext =  sprite_name.split('.')[-1] # get extension
 
@@ -77,4 +75,4 @@ class list(BaseView):
         return self.broker.getPlants().toxml();
 
 def notFound():
-    return web.notfound("!!!!! not found !!!!")
+    return web.notfound("Unknown command")

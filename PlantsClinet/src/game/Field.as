@@ -158,7 +158,7 @@ package game
 					this.addChild(obj);
 				}
 				px = startx+50*(j+1);
-				py = firstpy+(firstpheight+25-AppState.getPlantImgAtCoords(0,j+1).height)//starty+75*(j+1);
+				py = firstpy+(firstpheight+25-AppState.getPlantImgAtCoords(0,j+1).height);
 				pheight = 0;
 				pwidth = 0;
 			}

@@ -27,12 +27,6 @@ package game
 		
 		public function addImage(img:Img):Boolean
 		{
-			/*for each (var i:Img in BitmapCache.mImages)
-			{
-			if (i.plant_id == img.plant_id && i.state_id == img.state_id)
-			return false;
-			}*/
-
 			if (this.checkCache(img.plant_id, img.state_id) == null)
 			{			
 				BitmapCache.mImages.push(img);
@@ -73,7 +67,6 @@ package game
 			
 			if (all_loaded)
 			{
-				//trace("-------------------------all loaded");
 				this.mIsAllLoaded = true;
 				this.dispatchEvent(new Event("AllSpritesLoaded",true));
 			}

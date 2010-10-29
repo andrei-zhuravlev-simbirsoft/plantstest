@@ -36,17 +36,20 @@ package
 			}
 		}
 		
+		/***
+		 * returns tile object located in grid(x,y)
+		 * */
 		public static function getPlantImgAtCoords(x:int, y:int):Tile
 		{
 			for each (var p:Plant in AppState.field)
 			{
 				if (p.X == x && p.Y == y)
 				{
-					trace("PLANT - X:"+x.toString()+" Y:"+y.toString());
+					//trace("PLANT - X:"+x.toString()+" Y:"+y.toString());
 					return new Tile(x,y,p.getSprite(),true);
 				}
 			}
-			trace("HOLDER - X:"+x.toString()+" Y:"+y.toString());
+			//trace("HOLDER - X:"+x.toString()+" Y:"+y.toString());
 			return new Tile(x,y,new Img(),false);
 		}
 	}

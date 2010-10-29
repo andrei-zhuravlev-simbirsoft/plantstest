@@ -53,19 +53,13 @@ package models
 		{			
 			this.graphics.clear();
 			this.graphics.beginFill(color,alpha);
-			this.graphics.lineStyle(0,0,0.5);
+			this.graphics.lineStyle(0,0,alpha);
 			//this.graphics.drawRect(0,0,sizex,sizey);
 			this.graphics.moveTo(sizex*0.5,0);
 			this.graphics.lineTo(0,sizey*0.5);
 			this.graphics.lineTo(sizex*0.5,sizey);
 			this.graphics.lineTo(sizex,sizey*0.5);
 			this.graphics.lineTo(sizex*0.5,0);
-			//original
-			/*this.graphics.moveTo(-size,0);
-			this.graphics.lineTo(0,-size*0.5);
-			this.graphics.lineTo(size,0);
-			this.graphics.lineTo(0,size*0.5);
-			this.graphics.lineTo(-size,0);*/
 		}
 		
 		private function getImage(plant_id:int=-1, state_id:int=-1):Object

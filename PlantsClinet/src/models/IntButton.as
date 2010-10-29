@@ -12,7 +12,6 @@ package models
 		public function IntButton(label:String) {
 			this.label = label;
 			drawButton()
-			//button.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
 			addChild(button);
 		}
 		
@@ -28,11 +27,6 @@ package models
 			textLabel.selectable = false;
 			button.addChild(textLabel)
 		}
-		
-		/*private function mouseDownHandler(event:MouseEvent):void {
-			button.x += 20
-			if (button.x > 400) { button.x = 0}
-		}*/
 	}
 
 }

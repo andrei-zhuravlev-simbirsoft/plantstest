@@ -7,6 +7,7 @@ package utils {
 	import flash.xml.*;
 	
 	import models.*;
+	import events.ErrorOccuredEvent;
 	
 	public class DataLoader extends EventDispatcher
 	{    
@@ -133,7 +134,10 @@ package utils {
 					trace("new Herbarium received");
 					this.dispatchEvent(new Event("HerbariumLoaded",true));
 				break;				
-				case DataLoader.ERROR: 
+				case DataLoader.ERROR:
+					var id:int = int(data.attribute("id"));
+					var msg:String = data.attribute("message").toString();
+					this.dispatchEvent(new ErrorOccuredEvent(id,msg,true));
 				break;
 			}
 		}
@@ -151,7 +155,6 @@ package utils {
 				{
 					var externalXML:XML = new XML(loader.data);
 					parseData(externalXML);
-					//this.dispatchEvent(new Event("DataLoaded",true));
 				}
 				/*else // Image
 				{

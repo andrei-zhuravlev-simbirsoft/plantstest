@@ -23,7 +23,7 @@ package models
 			else
 			{
 				sprite.graphics.clear();
-				sprite.drawPlaceholder(100,50,0,0.5);
+				sprite.drawPlaceholder(100,50,0,0);
 				this.addChild(sprite);
 			}
 		}
@@ -38,7 +38,7 @@ package models
 			{
 				this.removeChildAt(0);
 				sprite.graphics.clear();
-				sprite.drawPlaceholder(100,50,0,0.8);
+				sprite.drawPlaceholder(100,50,0,0.5);
 				this.addChild(sprite);
 			}
 		}
@@ -52,7 +52,7 @@ package models
 			else
 			{	this.removeChildAt(0);
 				sprite.graphics.clear();
-				sprite.drawPlaceholder(100,50,0,0.5);
+				sprite.drawPlaceholder(100,50,0,0);
 				this.addChild(sprite);
 			}			
 		}

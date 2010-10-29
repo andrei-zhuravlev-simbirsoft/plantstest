@@ -1,4 +1,6 @@
 package {
+	import events.ErrorOccuredEvent;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
@@ -11,6 +13,7 @@ package {
 	import flash.events.MouseEvent;
 	import flash.filters.DisplacementMapFilterMode;
 	import flash.geom.Matrix;
+	import flash.text.TextField;
 	
 	import game.*;
 	
@@ -24,9 +27,17 @@ package {
 	[SWF(width="1024" , height="768")]
 	public class PlantsClinet extends MovieClip 
 	{
+		private static var MODE_VIEW:String = "view";
+		private static var MODE_SEED:String = "seed";
+		private static var MODE_DIG:String = "dig";
+		private static var MODE_ERR:String = "error";
+		
 		private var mLoader:DataLoader = new DataLoader();
 		private var mSpriteLoader:SpriteLoader = new SpriteLoader();
 		private var mCache:BitmapCache = BitmapCache.instance;
+		private var mMode:String = PlantsClinet.MODE_VIEW;
+		
+		private var mGameGrid:Field;
 		
 		public function PlantsClinet() 
 		{			
@@ -35,6 +46,7 @@ package {
 			
 			mLoader.addEventListener("StateLoaded",onStateUpdated);
 			mLoader.addEventListener("HerbariumLoaded",onHerbariumLoaded);
+			mLoader.addEventListener(ErrorOccuredEvent.TYPE,onError);
 			mCache.addEventListener("AllSpritesLoaded",onAllSpritesLoaded);
 			
 			mLoader.getHerbarium();
@@ -53,15 +65,31 @@ package {
 			var seedButton:IntButton = new IntButton("SEED");
 			seedButton.x = 100;
 			seedButton.y = 0;
-			//seedButton.addEventListener(MouseEvent.CLICK,onTurn);
+			seedButton.addEventListener(MouseEvent.CLICK,onSeed);
 			addChild(seedButton);
 
 			var digButton:IntButton = new IntButton("DIG");
 			digButton.x = 200;
 			digButton.y = 0;
-			//digButton.addEventListener(MouseEvent.CLICK,onTurn);
+			digButton.addEventListener(MouseEvent.CLICK,onDig);
 			addChild(digButton);
 			
+		}
+		
+		private function showMessage(message:String, color:Number = 0xffffffff):void
+		{
+			this.removeMessage();
+			
+			var textLabel:TextField = new TextField();
+			textLabel.text = message;
+			textLabel.x = 300;
+			textLabel.y = 0;
+			textLabel.scaleX = 2;
+			textLabel.scaleY = 2;
+			textLabel.selectable = false;
+			textLabel.width = 500;
+			textLabel.name = "Message";
+			this.addChild(textLabel)
 		}
 		
 		private function cleanupScene():void
@@ -78,13 +106,23 @@ package {
 		
 		private function onStateUpdated(event:Event):void
 		{	
-			// Here we have Herbarium & Initial State
-			this.cleanupScene();
-			
-			this.addButtons();
-			
-			// force loading all sprites
+			// Here we have Herbarium & Initial State	
+			// force loading all new sprites
 			AppState.getSpritesForPlants();
+			
+			if (mCache.isAllLoaded) // all bitmaps are loaded. can draw
+			{
+				this.draw(450,100);
+			}
+		}
+		
+		private function draw(initXCoord:int, initYCoord:int):void
+		{
+			this.cleanupScene();
+			this.mGameGrid= new Field(Config.GridSizeX,Config.GridSizeY,initXCoord,initYCoord);
+			this.addButtons();
+			this.mMode = PlantsClinet.MODE_VIEW;
+			this.addChild(this.mGameGrid);
 		}
 		
 		private function onHerbariumLoaded(event:Event):void
@@ -95,11 +133,11 @@ package {
 		
 		private function onAllSpritesLoaded(event:Event):void
 		{	
-			this.cleanupScene();
-			var f:Field = new Field(Config.GridSizeX,Config.GridSizeY,450,100);
+			this.draw(450,100);
+			/*this.cleanupScene();
+			this.mGameGrid = new Field(Config.GridSizeX,Config.GridSizeY,450,100);
 			this.addButtons();
-			//var f:Field = new Field(5,4,400,100);
-			this.addChild(f);
+			this.addChild(this.mGameGrid);*/
 			/*ar i:int = 0;
 			var px:int = 400;
 			var py:int = 200;
@@ -137,32 +175,47 @@ package {
 			this.addChild(z);*/
 		}
 		
-		private function onROver(event:MouseEvent):void
+		private function onError(event:ErrorOccuredEvent):void
 		{
-			(event.target as Img).drawPlaceholder(50,0,0.5);
+			var id:int = event.Id;
+			var msg:String = event.Message;
+			
+			this.showMessage("Error("+id.toString()+"): "+msg);
 		}
 		
-		private function onROut(event:MouseEvent):void
+		private function removeMessage():void
 		{
-			(event.target as Img).drawPlaceholder(50,0x00ff0000,0);
+			var msg:DisplayObject = this.getChildByName("Message"); 
+			if (msg != null)
+			{
+				this.removeChild(msg);
+			}
 		}
 		
 		private function onTurn(event:Event):void
 		{
 			trace("turn");
+			this.removeMessage();
 			mLoader.nextTurn();
 		}
 
 		private function onSeed(event:Event):void
 		{
 			trace("seed");
+			this.mMode = PlantsClinet.MODE_SEED;
+			//this.removeMessage();
+			this.showMessage("Select empty tile to seed");
+
 		}
 
 		private function onDig(event:Event):void
 		{
 			trace("dig");
+			this.mMode = PlantsClinet.MODE_DIG;
+			//this.removeMessage();
+			this.showMessage("Select plant to dig");
+			
+			this.mLoader.digPlant(100,100);
 		}
-
-		
 	}
 }
