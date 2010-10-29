@@ -31,7 +31,7 @@ package models
 		{
 			super();
 			
-			if (plant_id > 0 && state_id > 0) // image will be loaded
+			if (plant_id > 0) // image will be loaded
 			{
 				this.plant_id = plant_id;
 				this.state_id = state_id;

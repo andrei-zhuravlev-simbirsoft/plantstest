@@ -1,6 +1,8 @@
 package game
 {
 	
+	import events.TileSelectedEvent;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.MovieClip;
@@ -15,27 +17,20 @@ package game
 	
 	public class Field extends Sprite
 	{
-		
-		// Constants:
-		public static const SCR_WIDTH:int = 1024;
-		public static const SCR_HEIGHT:int = 768;
-		public static const CELL_SIZE:int = 100;
+		/*public static const CELL_SIZE:int = 100;
 		public static const DECAY:Number = 0.9;
 		public static const MAP_W:int = 10;
-		public static const MAP_H:int = 10;
-		
-		// Public Properties:		
-		
+		public static const MAP_H:int = 10;*/
 		
 		// Private Properties:
-		private var _speedX:Number = 0;
-		private var _speedY:Number = 0;
+		//private var _speedX:Number = 0;
+		//private var _speedY:Number = 0;
 		
 		/* Размер карты */
-		private var _mapWidth:int = MAP_W * CELL_SIZE;
-		private var _mapHeight:int = MAP_H * CELL_SIZE;
+		//private var _mapWidth:int = MAP_W * CELL_SIZE;
+		//private var _mapHeight:int = MAP_H * CELL_SIZE;
 		
-		private var _bmp:Bitmap; // Игровая сетка
+		//private var _bmp:Bitmap;
 		
 		// Initialization:
 		public function Field(width:int,height:int,startx:int,starty:int)
@@ -58,14 +53,17 @@ package game
 		private function onTileClick(event:MouseEvent):void
 		{
 			var t:Tile = (event.currentTarget as Tile);
-			var s:String = "Tile X-"+t.X.toString()+" Y-"+t.Y.toString()+" isPlant-"+t.hasPlant.toString();
-			ExternalInterface.call("alert",s);
-			trace(s);
+			/*var s:String = "Tile X-"+t.X.toString()+" Y-"+t.Y.toString()+" isPlant-"+t.hasPlant.toString();
+			if (ExternalInterface.available)
+				ExternalInterface.call("alert",s);
+			trace(s);*/
+			
+			this.dispatchEvent(new TileSelectedEvent(t,true));
 		}
 		
 		// Public Methods:
 		
-		public function hScroll(val:Number):void
+		/*public function hScroll(val:Number):void
 		{
 			_speedX += val;
 		}
@@ -83,42 +81,7 @@ package game
 		public function get mapHeight():int
 		{
 			return _mapHeight;
-		}
-				
-//		private function enterFrameHandler(e:Event):void
-//		{			
-//			/* Прибавляем скорость к положению карты */
-//			x += int(_speedX);
-//			y += int(_speedY);
-//			
-//			/* Горизонтальная прокрутка */
-//			if (x > 0) // Выезд за левый край
-//			{
-//				x = 0;
-//				_speedX = 0;
-//			}
-//			else if (x < -_mapWidth + SCR_WIDTH) // Выезд за правый край
-//			{
-//				x = -_mapWidth + SCR_WIDTH;
-//				_speedX = 0;
-//			}
-//			
-//			/* Вертикальная прокрутка */
-//			if (y > 0) // Выезд за верхний край
-//			{
-//				y = 0;
-//				_speedY = 0;
-//			}
-//			else if (y < -_mapHeight + SCR_HEIGHT) // Выезд за нижний край
-//			{
-//				y = -_mapHeight + SCR_HEIGHT;
-//				_speedY = 0;
-//			}			
-//			
-//			/* Применяем торможение к скорости */
-//			_speedX *= DECAY;
-//			_speedY *= DECAY;
-//		}
+		}*/
 		
 		private function grid(w:int, h:int, startx:int, starty:int):void
 		{
@@ -154,7 +117,7 @@ package game
 					py = obj.y
 					pheight = obj.height;
 					pwidth = obj.width;
-					trace("Draw at X:"+px.toString()+" Y:"+py.toString());
+					//trace("Draw at X:"+px.toString()+" Y:"+py.toString());
 					this.addChild(obj);
 				}
 				px = startx+50*(j+1);

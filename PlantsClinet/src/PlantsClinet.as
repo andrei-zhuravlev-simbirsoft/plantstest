@@ -1,5 +1,6 @@
 package {
 	import events.ErrorOccuredEvent;
+	import events.TileSelectedEvent;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -16,14 +17,11 @@ package {
 	import flash.text.TextField;
 	
 	import game.*;
-	
 	import models.*;
-	
 	import skins.*;
-	
 	import utils.*;
 	
-	//[SWF(widthPercent="1024" , heightPercent="768")]
+	//[SWF(widthPercent="100%" , heightPercent="100%")]
 	[SWF(width="1024" , height="768")]
 	public class PlantsClinet extends MovieClip 
 	{
@@ -36,6 +34,7 @@ package {
 		private var mSpriteLoader:SpriteLoader = new SpriteLoader();
 		private var mCache:BitmapCache = BitmapCache.instance;
 		private var mMode:String = PlantsClinet.MODE_VIEW;
+		private var mSelectedPlantId:int = -1;
 		
 		private var mGameGrid:Field;
 		
@@ -72,13 +71,69 @@ package {
 			digButton.x = 200;
 			digButton.y = 0;
 			digButton.addEventListener(MouseEvent.CLICK,onDig);
-			addChild(digButton);
+			addChild(digButton);	
+		}
+		
+		private function plantSelectionMenu(X:int,Y:int):void
+		{
+			var menu:Sprite = new Sprite();
+			menu.graphics.clear();
+			menu.graphics.beginFill(0xffaaaaaa);
+			menu.graphics.lineStyle(2,0,1);
+			menu.graphics.drawRect(X,Y,200,150);
+			menu.name = "PlantSelect";
 			
+			var cnt:int = 0;
+			for each (var p:Plant in AppState.herbarium)
+			{
+				var textLabel:TextField = new TextField();
+				textLabel.text = p.Name;;
+				textLabel.x = 0;
+				textLabel.y = 0;
+				textLabel.scaleX = 2;
+				textLabel.scaleY = 2;
+			
+				var box:Sprite = new Sprite();
+				box.x = X+10;
+				box.y = Y+40*cnt;
+				box.name = p.Id.toString();
+				box.addEventListener(MouseEvent.ROLL_OVER,
+					function(e:MouseEvent):void 
+					{
+						var s:Sprite = e.currentTarget as Sprite;
+						s.graphics.clear();
+						s.graphics.lineStyle(1,0,1);
+						s.graphics.drawRect(0,5,150,40);
+					}
+				);
+				box.addEventListener(MouseEvent.ROLL_OUT,
+					function(e:MouseEvent):void 
+					{
+						var s:Sprite = e.currentTarget as Sprite;
+						s.graphics.clear();
+					}
+				);
+				box.addEventListener(MouseEvent.CLICK,
+					function(e:MouseEvent):void 
+					{
+						var s:Sprite = e.currentTarget as Sprite;
+						
+						s.dispatchEvent(new Event("PlantSelected"));
+					}
+				);
+				box.addChild(textLabel);
+				box.addEventListener("PlantSelected",onSeedPlantSelected);
+				
+				menu.addChild(box);
+				cnt++;
+			}
+			
+			this.addChild(menu);
 		}
 		
 		private function showMessage(message:String, color:Number = 0xffffffff):void
 		{
-			this.removeMessage();
+			this.removeChildNyName("Message");
 			
 			var textLabel:TextField = new TextField();
 			textLabel.text = message;
@@ -88,7 +143,9 @@ package {
 			textLabel.scaleY = 2;
 			textLabel.selectable = false;
 			textLabel.width = 500;
+			textLabel.height = 50;
 			textLabel.name = "Message";
+			textLabel.border = true;
 			this.addChild(textLabel)
 		}
 		
@@ -120,6 +177,7 @@ package {
 		{
 			this.cleanupScene();
 			this.mGameGrid= new Field(Config.GridSizeX,Config.GridSizeY,initXCoord,initYCoord);
+			this.mGameGrid.addEventListener(TileSelectedEvent.TYPE, onTileSelected);
 			this.addButtons();
 			this.mMode = PlantsClinet.MODE_VIEW;
 			this.addChild(this.mGameGrid);
@@ -134,58 +192,62 @@ package {
 		private function onAllSpritesLoaded(event:Event):void
 		{	
 			this.draw(450,100);
-			/*this.cleanupScene();
-			this.mGameGrid = new Field(Config.GridSizeX,Config.GridSizeY,450,100);
-			this.addButtons();
-			this.addChild(this.mGameGrid);*/
-			/*ar i:int = 0;
-			var px:int = 400;
-			var py:int = 200;
-			var pheight:int = 0;
-			var pwidth:int = 0;
-			for each (var h:Plant in AppState.field)
-			{
-				var plant:Bitmap = h.getSprite().getBitmap();//0xffffffff);
-				if (pheight == 0 && pwidth == 0)
-				{
-					plant.x = px;
-					plant.y = py;
-				}
-				else
-				{
-					plant.x = px-(plant.width / 2);
-					if (pheight <= plant.height)
-						plant.y = py+(pheight+25-plant.height);
-					else
-						plant.y = py+(pheight+25-plant.height);//-50;
-				}
-
-
-				this.addChild(plant);
-				px = plant.x;
-				py = plant.y
-				pheight = plant.height;
-				pwidth = plant.width;
-			}
-			var z:Img = new Img();
-			z.x=300;
-			z.y=400;
-			z.addEventListener(MouseEvent.ROLL_OVER,onROver);
-			z.addEventListener(MouseEvent.ROLL_OUT,onROut);
-			this.addChild(z);*/
 		}
 		
 		private function onError(event:ErrorOccuredEvent):void
 		{
-			var id:int = event.Id;
-			var msg:String = event.Message;
+			var err:models.Error = event.error; 
 			
-			this.showMessage("Error("+id.toString()+"): "+msg);
+			this.showMessage("Error("+err.id.toString()+"): "+err.message, 0x00ff0000);
+			this.mMode = PlantsClinet.MODE_VIEW;
 		}
 		
-		private function removeMessage():void
+		private function onTileSelected(event:TileSelectedEvent):void
 		{
-			var msg:DisplayObject = this.getChildByName("Message"); 
+			var t:Tile = event.Tile;
+			
+			switch (this.mMode)
+			{
+				case PlantsClinet.MODE_VIEW:
+					
+				break;
+				case PlantsClinet.MODE_SEED:
+					if (!t.hasPlant && this.mSelectedPlantId > 0)
+					{
+						this.mLoader.seedPlant(t.X, t.Y, this.mSelectedPlantId);
+						this.mSelectedPlantId = -1;
+					}
+					else
+					{
+						this.mMode = PlantsClinet.MODE_VIEW;
+						this.showMessage("Tile is not empty or plant is not selected.Can't seed", 0x00ff0000);
+					}
+				break;
+				case PlantsClinet.MODE_DIG:
+					if (t.hasPlant)
+						this.mLoader.digPlant(t.X, t.Y);
+					else
+					{
+						this.mMode = PlantsClinet.MODE_VIEW;
+						this.showMessage("No plant selected", 0x00ff0000);
+					}
+				break;
+				case PlantsClinet.MODE_ERR:
+				break;
+			}
+		}
+		
+		private function onSeedPlantSelected(event:Event):void
+		{
+			this.mSelectedPlantId = int((event.currentTarget as Sprite).name);
+			this.removeChildNyName("PlantSelect");
+			this.showMessage("Select empty tile to seed");
+			this.mMode = PlantsClinet.MODE_SEED;
+		}
+		
+		private function removeChildNyName(name:String):void
+		{
+			var msg:DisplayObject = this.getChildByName(name); 
 			if (msg != null)
 			{
 				this.removeChild(msg);
@@ -194,28 +256,32 @@ package {
 		
 		private function onTurn(event:Event):void
 		{
+			if (this.mMode != PlantsClinet.MODE_VIEW)
+				return;
+			
 			trace("turn");
-			this.removeMessage();
 			mLoader.nextTurn();
 		}
 
 		private function onSeed(event:Event):void
 		{
+			if (this.mMode != PlantsClinet.MODE_VIEW)
+				return;
+			
 			trace("seed");
+			this.plantSelectionMenu(100,100);
 			this.mMode = PlantsClinet.MODE_SEED;
-			//this.removeMessage();
-			this.showMessage("Select empty tile to seed");
-
+			this.showMessage("Select plant to seed from menu");
 		}
 
 		private function onDig(event:Event):void
 		{
+			if (this.mMode != PlantsClinet.MODE_VIEW)
+				return;
+			
 			trace("dig");
 			this.mMode = PlantsClinet.MODE_DIG;
-			//this.removeMessage();
 			this.showMessage("Select plant to dig");
-			
-			this.mLoader.digPlant(100,100);
 		}
 	}
 }

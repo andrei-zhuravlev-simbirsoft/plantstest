@@ -43,7 +43,7 @@ package game
 				if (i.plant_id == plant_id && i.state_id == state_id)
 					return i;
 			}
-			
+			this.mIsAllLoaded = false;
 			return null;
 		}
 		

@@ -1,5 +1,7 @@
 package utils {
 	
+	import events.ErrorOccuredEvent;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -7,7 +9,6 @@ package utils {
 	import flash.xml.*;
 	
 	import models.*;
-	import events.ErrorOccuredEvent;
 	
 	public class DataLoader extends EventDispatcher
 	{    
@@ -137,7 +138,7 @@ package utils {
 				case DataLoader.ERROR:
 					var id:int = int(data.attribute("id"));
 					var msg:String = data.attribute("message").toString();
-					this.dispatchEvent(new ErrorOccuredEvent(id,msg,true));
+					this.dispatchEvent(new ErrorOccuredEvent(new models.Error(id,msg),true));
 				break;
 			}
 		}
@@ -156,11 +157,6 @@ package utils {
 					var externalXML:XML = new XML(loader.data);
 					parseData(externalXML);
 				}
-				/*else // Image
-				{
-					this.data = loader.data;
-					this.dispatchEvent(new Event("ImageLoaded",true));
-				}*/
 			} 
 			catch (e:TypeError) 
 			{
