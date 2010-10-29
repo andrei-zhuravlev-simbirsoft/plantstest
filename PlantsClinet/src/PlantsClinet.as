@@ -17,8 +17,11 @@ package {
 	import flash.text.TextField;
 	
 	import game.*;
+	
 	import models.*;
+	
 	import skins.*;
+	
 	import utils.*;
 	
 	//[SWF(widthPercent="100%" , heightPercent="100%")]
@@ -143,9 +146,9 @@ package {
 			textLabel.scaleY = 2;
 			textLabel.selectable = false;
 			textLabel.width = 500;
-			textLabel.height = 50;
+			textLabel.height = 20;
 			textLabel.name = "Message";
-			textLabel.border = true;
+			//textLabel.border = true;
 			this.addChild(textLabel)
 		}
 		
@@ -167,7 +170,7 @@ package {
 			// force loading all new sprites
 			AppState.getSpritesForPlants();
 			
-			if (mCache.isAllLoaded) // all bitmaps are loaded. can draw
+			if (mCache.isAllLoaded || BitmapCache.mImages.length == 0) // all bitmaps are loaded or empty field. can draw
 			{
 				this.draw(450,100);
 			}
